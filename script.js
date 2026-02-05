@@ -1,7 +1,7 @@
 // 進捗保存用キー
 const STORAGE_KEY = "star_story_progress_v1";
 
-// シンプルなシーンデータの例
+// シーンデータ
 const scenes = [
   {
     id: "scene_01",
@@ -18,6 +18,7 @@ const scenes = [
 
 let currentSceneIndex = 0;
 let currentLineIndex = 0;
+let hasUserTappedOnce = false;
 
 const gameScreen = document.getElementById("game-screen");
 const nameLabel = document.getElementById("name-label");
@@ -54,14 +55,12 @@ function saveProgress() {
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (e) {
-    // プライベートモードなどで保存できない場合は無視
     console.warn("Failed to save progress:", e);
   }
 }
 
 /**
  * 保存されている進捗を読み込む
- * なければ null を返す
  */
 function loadProgress() {
   try {
@@ -69,7 +68,6 @@ function loadProgress() {
     if (!raw) return null;
     const data = JSON.parse(raw);
 
-    // 一応範囲チェック
     if (
       typeof data.sceneIndex === "number" &&
       typeof data.lineIndex === "number" &&
@@ -105,14 +103,13 @@ function renderCurrentLine() {
 function goToNextLine() {
   const scene = getCurrentScene();
 
-  // まだ行が残っている場合
   if (currentLineIndex < scene.lines.length - 1) {
     currentLineIndex += 1;
     renderCurrentLine();
     return;
   }
 
-  // 最後の行を読んだあと → 区切りオーバーレイを表示
+  // 最後の行 → 区切りオーバーレイ
   showSceneBreak();
 }
 
@@ -121,10 +118,6 @@ function goToNextLine() {
  */
 function showSceneBreak() {
   sceneBreakOverlay.classList.add("scene-break--visible");
-  // 区切り中は TAP ヒントを消す
-  if (tapHint) {
-    tapHint.style.visibility = "hidden";
-  }
 }
 
 /**
@@ -133,7 +126,6 @@ function showSceneBreak() {
 function proceedFromSceneBreak() {
   sceneBreakOverlay.classList.remove("scene-break--visible");
 
-  // 次シーンがあれば進む。なければとりあえず同じシーンをループ。
   if (currentSceneIndex < scenes.length - 1) {
     currentSceneIndex += 1;
   } else {
@@ -141,23 +133,24 @@ function proceedFromSceneBreak() {
   }
   currentLineIndex = 0;
   renderCurrentLine();
-
-  // TAP ヒントを再表示
-  if (tapHint) {
-    tapHint.style.visibility = "visible";
-  }
 }
 
 /**
  * 初期化
  */
 function init() {
-  // 進捗があれば復元
   const saved = loadProgress();
+
   if (saved) {
+    // 2回目以降の訪問：途中から＋TAPは最初から非表示
     currentSceneIndex = saved.sceneIndex;
     currentLineIndex = saved.lineIndex;
+    hasUserTappedOnce = true;
+    if (tapHint) {
+      tapHint.style.display = "none";
+    }
   } else {
+    // 初回訪問
     currentSceneIndex = 0;
     currentLineIndex = 0;
   }
@@ -166,15 +159,22 @@ function init() {
 
   // 画面タップでテキストを進める
   gameScreen.addEventListener("click", (event) => {
-    // オーバーレイが出ているときは、そちらのタップ優先
     if (sceneBreakOverlay.classList.contains("scene-break--visible")) {
       return;
     }
 
-    // ボタン類のクリックは無視してテキストを進めない
+    // ボタン類のクリックは無視
     const target = event.target;
     if (target.closest(".ui-button")) {
       return;
+    }
+
+    // 最初の1回タップしたら TAP ヒントを完全に消す
+    if (!hasUserTappedOnce) {
+      hasUserTappedOnce = true;
+      if (tapHint) {
+        tapHint.style.display = "none";
+      }
     }
 
     goToNextLine();
@@ -186,5 +186,4 @@ function init() {
   });
 }
 
-// DOMが読み込まれたら初期化
 document.addEventListener("DOMContentLoaded", init);

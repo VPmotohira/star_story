@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>長編ノベルゲーム（プロトタイプ）</title>
+  <title>SECOND CROWN - Prototype</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -11,17 +11,42 @@
 
     <!-- 上部バー（タイトル＋進捗バー） -->
     <header class="top-bar">
-      <div class="top-bar__title">- PROTOTYPE -</div>
+      <div class="top-bar__title">SECOND CROWN</div>
       <div class="progress">
         <div class="progress__inner" id="progress-bar"></div>
       </div>
     </header>
 
+    <!-- タイトル画面オーバーレイ -->
+    <div class="title-screen" id="title-screen">
+      <div class="title-screen__inner">
+        <div class="title-logo">
+          <span class="title-logo__main">SECOND</span>
+          <span class="title-logo__main">CROWN</span>
+        </div>
+        <div class="title-logo__line"></div>
+        <div class="title-logo__tagline">History is a choice.</div>
+
+        <div class="title-buttons">
+          <button class="title-button" id="btn-start" type="button">
+            START
+          </button>
+          <button class="title-button title-button--secondary" id="btn-continue" type="button">
+            CONTINUE
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- 背景とゲーム画面 -->
     <main class="game-screen" id="game-screen">
 
       <!-- 背景レイヤー -->
-      <div class="background"></div>
+      <div class="background">
+        <!-- 後でここに <img id="bg-image"> を足してもOK -->
+      </div>
+
+      <!-- 立ち絵も後でここに <img id="char-image"> を足す予定 -->
 
       <!-- テキストウィンドウ -->
       <section class="text-window" id="text-window">
@@ -44,8 +69,8 @@
         <div class="scene-break__inner">
           <div class="scene-break__symbol">◆</div>
           <div class="scene-break__text">
-            観測ログを一時保存しました。<br />
-            タップして次の観測へ。
+            Observation log stored.<br />
+            Tap to proceed.
           </div>
         </div>
       </div>

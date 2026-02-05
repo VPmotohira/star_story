@@ -181,14 +181,15 @@ body {
 .char-image {
   position: absolute;
   left: 50%;
-  bottom: -10%;        /* 足元を画面外に */
+  bottom: 5%;          /* 画面の中に持ち上げる：-10% → 5% */
   transform: translateX(-50%);
-  height: 130%;        /* 上半身を大きく見せる */
+  height: 115%;        /* 拡大を少し弱める：130% → 115% */
   object-fit: contain;
   pointer-events: none;
   z-index: 5;
   transition: opacity 0.3s ease-out;
 }
+
 
 /* =========================
    テキストウィンドウ

@@ -1,0 +1,220 @@
+/* ベース */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue",
+    "Segoe UI", "YuGothic", "Yu Gothic", "Meiryo", sans-serif;
+  background: #05060b;
+  color: #f5f5f5;
+}
+
+/* アプリ全体 */
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 上部バー */
+
+.top-bar {
+  width: 100%;
+  max-width: 600px;
+  padding: 8px 12px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.top-bar__title {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #a0a6c0;
+}
+
+/* 進捗バー */
+
+.progress {
+  width: 100%;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.progress__inner {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #76a9ff, #c794ff);
+  transition: width 0.25s ease-out;
+}
+
+/* ゲーム画面 */
+
+.game-screen {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  flex: 1;
+  height: calc(100vh - 50px);
+  overflow: hidden;
+}
+
+/* 背景 */
+
+.background {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at top, #22263a 0, #05060b 55%);
+  background-size: cover;
+  filter: saturate(120%);
+}
+
+/* テキストウィンドウ */
+
+.text-window {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 12px 14px 14px;
+  min-height: 32%;
+  background: linear-gradient(
+    to top,
+    rgba(3, 4, 10, 0.92),
+    rgba(3, 4, 10, 0.85),
+    rgba(3, 4, 10, 0.7)
+  );
+  backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* 名前ラベル */
+
+.name-label {
+  display: inline-block;
+  min-width: 80px;
+  margin-bottom: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(18, 26, 54, 0.9);
+  color: #e3e7ff;
+}
+
+/* テキスト本体 */
+
+.text-content {
+  font-size: 15px;
+  line-height: 1.7;
+  color: #f5f6ff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+  word-break: break-all;
+}
+
+/* UIボタン群 */
+
+.ui-buttons {
+  position: absolute;
+  right: 10px;
+  bottom: calc(32% + 8px);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 5;
+}
+
+.ui-button {
+  border: none;
+  padding: 4px 8px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  background: rgba(8, 12, 28, 0.88);
+  color: #d7dcff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+}
+
+.ui-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 0 0 rgba(0, 0, 0, 0.3);
+}
+
+/* シーン区切りオーバーレイ */
+
+.scene-break {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(5, 6, 11, 0.1), rgba(5, 6, 11, 0.88));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease-out;
+  z-index: 10;
+}
+
+.scene-break--visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.scene-break__inner {
+  text-align: center;
+  padding: 16px 22px;
+  border-radius: 16px;
+  border: 1px solid rgba(198, 204, 255, 0.35);
+  background: rgba(6, 8, 20, 0.9);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+}
+
+.scene-break__symbol {
+  font-size: 22px;
+  margin-bottom: 8px;
+  color: #e5e9ff;
+}
+
+.scene-break__text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #d7dcff;
+}
+
+/* タップしやすさ（スマホ向け） */
+
+@media (max-width: 480px) {
+  .text-window {
+    padding: 12px 12px 16px;
+    min-height: 38%;
+  }
+
+  .text-content {
+    font-size: 15.5px;
+    line-height: 1.8;
+  }
+
+  .ui-buttons {
+    right: 8px;
+    bottom: calc(38% + 6px);
+  }
+}

@@ -7,7 +7,7 @@ const STORAGE_KEY = "second_crown_progress_v1";
  * - type: "line" | "sceneBreak"
  * - speaker: 話者名（ナレーションも含む）
  * - text: 本文
- * - bg / char: 背景ID・立ち絵ID（将来用）
+ * - bg / char: 背景ID・立ち絵ID
  */
 const script = [
   {
@@ -40,7 +40,7 @@ const script = [
     speaker: "ナレーション",
     text: "――この『観測』を、介入に変える気はあるか？",
     bg: "city_night",
-    char: null
+    char: "kaname_normal" // ここで立ち絵を出してみる
   },
   {
     id: "prologue_005",
@@ -48,25 +48,32 @@ const script = [
     speaker: "ナレーション",
     text: "指先が、躊躇いの輪郭をなぞる。ほんの少しだけ、世界が静かになる。",
     bg: "city_night",
-    char: null
+    char: "kaname_normal"
   },
 
-  // ここが区切り（タイトルで言うプロローグの終端など）
+  // 区切り（観測ログ）
   {
     id: "prologue_break_001",
-    type: "sceneBreak"
+    type: "sceneBreak",
+    bg: "city_night",
+    char: null
   }
 
-  // この下に第1章の行を足していくイメージ
-  // {
-  //   id: "fr_intro_001",
-  //   type: "line",
-  //   speaker: "ナレーション",
-  //   text: "1792年5月。飢えと革命の熱狂に包まれたパリ。",
-  //   bg: "paris_night",
-  //   char: null
-  // },
+  // この下に第1章などを足していく
 ];
+
+// 背景ID -> 画像パス
+const BG_MAP = {
+  city_night: "images/bg_city_night.jpg",
+  paris_night: "images/bg_paris_night.jpg",
+  palace_room: "images/bg_palace_room.jpg"
+};
+
+// 立ち絵ID -> 画像パス
+const CHAR_MAP = {
+  kaname_normal: "images/kaname_normal.png",
+  mia_normal: "images/mia_normal.png"
+};
 
 // タイムライン上の現在位置（script 配列のインデックス）
 let currentIndex = 0;
@@ -86,6 +93,10 @@ const titleScreen = document.getElementById("title-screen");
 const btnStart = document.getElementById("btn-start");
 const btnContinue = document.getElementById("btn-continue");
 
+// 背景＆立ち絵画像
+const bgImage = document.getElementById("bg-image");
+const charImage = document.getElementById("char-image");
+
 /**
  * 現在のブロックを取得
  */
@@ -100,7 +111,6 @@ function updateProgress() {
   const total = script.length;
   if (!progressBar || total === 0) return;
 
-  // 0〜1 の範囲で現在位置の割合を計算
   const progress = Math.min((currentIndex + 1) / total, 1);
   progressBar.style.width = `${progress * 100}%`;
 }
@@ -152,14 +162,45 @@ function clearProgress() {
 }
 
 /**
+ * 背景＆立ち絵の更新
+ */
+function updateVisuals(block) {
+  if (!block) return;
+
+  // 背景
+  if (bgImage) {
+    if (block.bg && BG_MAP[block.bg]) {
+      bgImage.src = BG_MAP[block.bg];
+      bgImage.style.opacity = "1";
+    } else {
+      // bg が指定されていない場合は、今は「前のまま」にしておく
+      // まっさらにしたければ以下を有効化
+      // bgImage.style.opacity = "0";
+    }
+  }
+
+  // 立ち絵
+  if (charImage) {
+    if (block.char && CHAR_MAP[block.char]) {
+      charImage.src = CHAR_MAP[block.char];
+      charImage.style.opacity = "1";
+    } else {
+      charImage.style.opacity = "0";
+    }
+  }
+}
+
+/**
  * 現在のブロックを画面に反映
  */
 function renderCurrentBlock() {
   const block = getCurrentBlock();
   if (!block) return;
 
+  // まず背景・立ち絵を更新
+  updateVisuals(block);
+
   if (block.type === "line") {
-    // セリフ・ナレーション
     if (nameLabel) {
       nameLabel.textContent = block.speaker || "";
     }
@@ -167,17 +208,13 @@ function renderCurrentBlock() {
       textContent.textContent = block.text || "";
     }
 
-    // TODO: bg / char の反映は、このあと背景・立ち絵機能を足すときに実装
-
     updateProgress();
     saveProgress();
   } else if (block.type === "sceneBreak") {
-    // 区切りオーバーレイ表示
     showSceneBreak();
     updateProgress();
     saveProgress();
   } else {
-    // 未知の type はとりあえずスキップ候補（今は使わない）
     updateProgress();
   }
 }
@@ -189,7 +226,6 @@ function goToNextBlock() {
   const block = getCurrentBlock();
   if (!block) return;
 
-  // sceneBreak 中はここでは進めず、オーバーレイ側に任せる
   if (block.type === "sceneBreak") {
     return;
   }
@@ -198,7 +234,6 @@ function goToNextBlock() {
     currentIndex += 1;
     renderCurrentBlock();
   } else {
-    // 一番最後まで来たら、とりあえず止める（ループさせたければここを変更）
     currentIndex = script.length - 1;
   }
 }
@@ -247,7 +282,6 @@ function continueGame() {
   const saved = loadProgress();
 
   if (!saved) {
-    // 進捗がない場合は最初から
     startNewGame();
     return;
   }
@@ -278,11 +312,9 @@ function setupTitleScreen() {
   const saved = loadProgress();
 
   if (saved) {
-    // CONTINUE 有効
     btnContinue.disabled = false;
     btnContinue.classList.remove("title-button--disabled");
   } else {
-    // CONTINUE 無効
     btnContinue.disabled = true;
     btnContinue.classList.add("title-button--disabled");
   }
@@ -305,7 +337,6 @@ function init() {
 
   // ここではまだ本編は描画しない（START/CONTINUE押下で開始）
 
-  // 画面タップでテキストを進める
   gameScreen.addEventListener("click", (event) => {
     // タイトル画面が出ている間は何もしない
     if (titleScreen && titleScreen.style.display !== "none") {
@@ -334,7 +365,6 @@ function init() {
     goToNextBlock();
   });
 
-  // シーン区切りオーバーレイのタップ処理
   sceneBreakOverlay.addEventListener("click", () => {
     proceedFromSceneBreak();
   });

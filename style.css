@@ -75,7 +75,7 @@ body {
   overflow: hidden;
 }
 
-/* 背景 */
+/* 背景（ベースのグラデーション） */
 
 .background {
   position: absolute;
@@ -83,6 +83,33 @@ body {
   background: radial-gradient(circle at top, #22263a 0, #05060b 55%);
   background-size: cover;
   filter: saturate(120%);
+}
+
+/* 背景画像 */
+
+.bg-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(120%);
+  opacity: 1;
+  transition: opacity 0.25s ease-out;
+}
+
+/* 立ち絵 */
+
+.char-image {
+  position: absolute;
+  bottom: 32%;          /* テキストウィンドウの少し上に立つ感じ */
+  left: 50%;
+  transform: translateX(-50%);
+  max-height: 70%;
+  pointer-events: none;
+  opacity: 0;           /* char が指定されたときだけ 1 にする */
+  transition: opacity 0.2s ease-out;
+  z-index: 2;
 }
 
 /* テキストウィンドウ */
@@ -102,6 +129,7 @@ body {
   );
   backdrop-filter: blur(8px);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 3; /* 立ち絵より前面に出す */
 }
 
 /* 名前ラベル */
@@ -159,7 +187,7 @@ body {
   }
 }
 
-/* UIボタン群 */
+/* UIボタン群（LOG / AUTO / MENU） */
 
 .ui-buttons {
   position: absolute;

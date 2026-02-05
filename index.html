@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>長編ノベルゲーム（プロトタイプ）</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+
+    <!-- 上部バー（タイトル＋進捗バー） -->
+    <header class="top-bar">
+      <div class="top-bar__title">- Prototype -</div>
+      <div class="progress">
+        <div class="progress__inner" id="progress-bar"></div>
+      </div>
+    </header>
+
+    <!-- 背景とゲーム画面 -->
+    <main class="game-screen" id="game-screen">
+
+      <!-- 背景レイヤー（とりあえずグラデ） -->
+      <div class="background"></div>
+
+      <!-- テキストウィンドウ -->
+      <section class="text-window" id="text-window">
+        <div class="name-label" id="name-label"></div>
+        <div class="text-content" id="text-content"></div>
+      </section>
+
+      <!-- 画面右下のメニューボタン（まだ中身はダミー） -->
+      <div class="ui-buttons">
+        <button class="ui-button" type="button">LOG</button>
+        <button class="ui-button" type="button">AUTO</button>
+        <button class="ui-button" type="button">MENU</button>
+      </div>
+
+      <!-- シーン区切り用のオーバーレイ -->
+      <div class="scene-break" id="scene-break">
+        <div class="scene-break__inner">
+          <div class="scene-break__symbol">◆</div>
+          <div class="scene-break__text">
+            一区切りです。<br />
+            タップして続きへ。
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

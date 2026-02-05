@@ -92,7 +92,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  padding: 12px 14px 16px;
+  padding: 12px 14px 18px;
   min-height: 32%;
   background: linear-gradient(
     to top,
@@ -133,28 +133,29 @@ body {
 
 .tap-hint {
   margin-top: 6px;
-  font-size: 10px;
-  letter-spacing: 0.2em;
+  font-size: 9px;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(215, 220, 255, 0.6);
+  color: rgba(215, 220, 255, 0.35);
   text-align: right;
-  opacity: 0.0;
+  opacity: 0;
+  display: inline-block;
   animation: tapHintPulse 2.2s ease-in-out infinite;
   pointer-events: none;
 }
 
 @keyframes tapHintPulse {
   0% {
-    opacity: 0.0;
+    opacity: 0;
   }
   30% {
     opacity: 0.7;
   }
   70% {
-    opacity: 0.2;
+    opacity: 0.15;
   }
   100% {
-    opacity: 0.0;
+    opacity: 0;
   }
 }
 

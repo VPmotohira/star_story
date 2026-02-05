@@ -14,9 +14,10 @@ const BG_MAP = {
 
 // ------- 立ち絵マップ -------
 const CHAR_MAP = {
-  mia_normal: "images/char_mia_normal.png"
-  // 表情差分を作ったらここに mia_smile などを追加
+  mia_normal: "images/char_mia_normal.png",
+  iroha_normal: "images/char_iroha_normal.png"
 };
+
 
 // ------- シナリオ（1タップ＝1要素） -------
 const script = [

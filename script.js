@@ -1,3 +1,6 @@
+// 進捗保存用キー
+const STORAGE_KEY = "star_story_progress_v1";
+
 // シンプルなシーンデータの例
 const scenes = [
   {
@@ -21,6 +24,7 @@ const nameLabel = document.getElementById("name-label");
 const textContent = document.getElementById("text-content");
 const sceneBreakOverlay = document.getElementById("scene-break");
 const progressBar = document.getElementById("progress-bar");
+const tapHint = document.getElementById("tap-hint");
 
 /**
  * 現在のシーンオブジェクトを取得
@@ -40,6 +44,50 @@ function updateProgress() {
 }
 
 /**
+ * 現在の状態を localStorage に保存
+ */
+function saveProgress() {
+  try {
+    const data = {
+      sceneIndex: currentSceneIndex,
+      lineIndex: currentLineIndex
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {
+    // プライベートモードなどで保存できない場合は無視
+    console.warn("Failed to save progress:", e);
+  }
+}
+
+/**
+ * 保存されている進捗を読み込む
+ * なければ null を返す
+ */
+function loadProgress() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+
+    // 一応範囲チェック
+    if (
+      typeof data.sceneIndex === "number" &&
+      typeof data.lineIndex === "number" &&
+      data.sceneIndex >= 0 &&
+      data.sceneIndex < scenes.length
+    ) {
+      const scene = scenes[data.sceneIndex];
+      if (data.lineIndex >= 0 && data.lineIndex < scene.lines.length) {
+        return data;
+      }
+    }
+  } catch (e) {
+    console.warn("Failed to load progress:", e);
+  }
+  return null;
+}
+
+/**
  * テキストを描画
  */
 function renderCurrentLine() {
@@ -48,6 +96,7 @@ function renderCurrentLine() {
   const line = scene.lines[currentLineIndex] || "";
   textContent.textContent = line;
   updateProgress();
+  saveProgress();
 }
 
 /**
@@ -72,6 +121,10 @@ function goToNextLine() {
  */
 function showSceneBreak() {
   sceneBreakOverlay.classList.add("scene-break--visible");
+  // 区切り中は TAP ヒントを消す
+  if (tapHint) {
+    tapHint.style.visibility = "hidden";
+  }
 }
 
 /**
@@ -88,15 +141,27 @@ function proceedFromSceneBreak() {
   }
   currentLineIndex = 0;
   renderCurrentLine();
+
+  // TAP ヒントを再表示
+  if (tapHint) {
+    tapHint.style.visibility = "visible";
+  }
 }
 
 /**
  * 初期化
  */
 function init() {
-  const scene = getCurrentScene();
-  nameLabel.textContent = scene.speaker || "";
-  currentLineIndex = 0;
+  // 進捗があれば復元
+  const saved = loadProgress();
+  if (saved) {
+    currentSceneIndex = saved.sceneIndex;
+    currentLineIndex = saved.lineIndex;
+  } else {
+    currentSceneIndex = 0;
+    currentLineIndex = 0;
+  }
+
   renderCurrentLine();
 
   // 画面タップでテキストを進める
@@ -106,7 +171,7 @@ function init() {
       return;
     }
 
-    // ボタン類のクリックは無視
+    // ボタン類のクリックは無視してテキストを進めない
     const target = event.target;
     if (target.closest(".ui-button")) {
       return;

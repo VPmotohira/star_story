@@ -1,26 +1,79 @@
-// 進捗保存用キー
-const STORAGE_KEY = "star_story_progress_v1";
+// セーブデータ用キー
+const STORAGE_KEY = "second_crown_progress_v1";
 
-// シーンデータ（仮）
-// ※このあと増やしていく
-const scenes = [
+/**
+ * 流し込み用スクリプト
+ * - 1要素 = タイムライン上の1ステップ
+ * - type: "line" | "sceneBreak"
+ * - speaker: 話者名（ナレーションも含む）
+ * - text: 本文
+ * - bg / char: 背景ID・立ち絵ID（将来用）
+ */
+const script = [
   {
-    id: "scene_01",
-    speaker: "Narration",
-    lines: [
-      "The city at night turned slowly, like a machine in need of oil.",
-      "Wind slipped between towers, carrying the faint scent of something burned and long forgotten.",
-      "On your phone, a single notification glowed from an unknown sender.",
-      "— Will you turn this observation into interference?",
-      "Your fingertip traces the outline of hesitation. For a moment, the world holds its breath."
-    ]
+    id: "prologue_001",
+    type: "line",
+    speaker: "ナレーション",
+    text: "夜更けの都市は、静かに軋む機械のように、ゆっくりと回転していた。",
+    bg: "city_night",
+    char: null
+  },
+  {
+    id: "prologue_002",
+    type: "line",
+    speaker: "ナレーション",
+    text: "ビルの谷間を縫うように吹き抜ける風は、どこか懐かしい焦げた匂いを運んでくる。",
+    bg: "city_night",
+    char: null
+  },
+  {
+    id: "prologue_003",
+    type: "line",
+    speaker: "ナレーション",
+    text: "君のスマホの画面には、見知らぬ送信者からの短いメッセージが、ひとつだけ光っていた。",
+    bg: "city_night",
+    char: null
+  },
+  {
+    id: "prologue_004",
+    type: "line",
+    speaker: "ナレーション",
+    text: "――この『観測』を、介入に変える気はあるか？",
+    bg: "city_night",
+    char: null
+  },
+  {
+    id: "prologue_005",
+    type: "line",
+    speaker: "ナレーション",
+    text: "指先が、躊躇いの輪郭をなぞる。ほんの少しだけ、世界が静かになる。",
+    bg: "city_night",
+    char: null
+  },
+
+  // ここが区切り（タイトルで言うプロローグの終端など）
+  {
+    id: "prologue_break_001",
+    type: "sceneBreak"
   }
+
+  // この下に第1章の行を足していくイメージ
+  // {
+  //   id: "fr_intro_001",
+  //   type: "line",
+  //   speaker: "ナレーション",
+  //   text: "1792年5月。飢えと革命の熱狂に包まれたパリ。",
+  //   bg: "paris_night",
+  //   char: null
+  // },
 ];
 
-let currentSceneIndex = 0;
-let currentLineIndex = 0;
+// タイムライン上の現在位置（script 配列のインデックス）
+let currentIndex = 0;
+// 「タップしたことがあるか」（TAPヒント制御用）
 let hasUserTappedOnce = false;
 
+// DOM取得
 const gameScreen = document.getElementById("game-screen");
 const nameLabel = document.getElementById("name-label");
 const textContent = document.getElementById("text-content");
@@ -28,36 +81,37 @@ const sceneBreakOverlay = document.getElementById("scene-break");
 const progressBar = document.getElementById("progress-bar");
 const tapHint = document.getElementById("tap-hint");
 
-// タイトル関連
+// タイトル画面関連
 const titleScreen = document.getElementById("title-screen");
 const btnStart = document.getElementById("btn-start");
 const btnContinue = document.getElementById("btn-continue");
 
 /**
- * 現在のシーンオブジェクトを取得
+ * 現在のブロックを取得
  */
-function getCurrentScene() {
-  return scenes[currentSceneIndex];
+function getCurrentBlock() {
+  return script[currentIndex] || null;
 }
 
 /**
  * 進捗バー更新
  */
 function updateProgress() {
-  const scene = getCurrentScene();
-  const totalLines = scene.lines.length;
-  const progress = Math.min(currentLineIndex / totalLines, 1);
+  const total = script.length;
+  if (!progressBar || total === 0) return;
+
+  // 0〜1 の範囲で現在位置の割合を計算
+  const progress = Math.min((currentIndex + 1) / total, 1);
   progressBar.style.width = `${progress * 100}%`;
 }
 
 /**
- * 現在の状態を localStorage に保存
+ * 現在位置を localStorage に保存
  */
 function saveProgress() {
   try {
     const data = {
-      sceneIndex: currentSceneIndex,
-      lineIndex: currentLineIndex
+      index: currentIndex
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch (e) {
@@ -74,15 +128,10 @@ function loadProgress() {
     if (!raw) return null;
     const data = JSON.parse(raw);
 
-    if (
-      typeof data.sceneIndex === "number" &&
-      typeof data.lineIndex === "number" &&
-      data.sceneIndex >= 0 &&
-      data.sceneIndex < scenes.length
-    ) {
-      const scene = scenes[data.sceneIndex];
-      if (data.lineIndex >= 0 && data.lineIndex < scene.lines.length) {
-        return data;
+    if (typeof data.index === "number") {
+      const idx = data.index;
+      if (idx >= 0 && idx < script.length) {
+        return { index: idx };
       }
     }
   } catch (e) {
@@ -92,7 +141,7 @@ function loadProgress() {
 }
 
 /**
- * セーブデータを削除
+ * セーブデータ削除
  */
 function clearProgress() {
   try {
@@ -103,62 +152,84 @@ function clearProgress() {
 }
 
 /**
- * テキストを描画
+ * 現在のブロックを画面に反映
  */
-function renderCurrentLine() {
-  const scene = getCurrentScene();
-  nameLabel.textContent = scene.speaker || "";
-  const line = scene.lines[currentLineIndex] || "";
-  textContent.textContent = line;
-  updateProgress();
-  saveProgress();
+function renderCurrentBlock() {
+  const block = getCurrentBlock();
+  if (!block) return;
+
+  if (block.type === "line") {
+    // セリフ・ナレーション
+    if (nameLabel) {
+      nameLabel.textContent = block.speaker || "";
+    }
+    if (textContent) {
+      textContent.textContent = block.text || "";
+    }
+
+    // TODO: bg / char の反映は、このあと背景・立ち絵機能を足すときに実装
+
+    updateProgress();
+    saveProgress();
+  } else if (block.type === "sceneBreak") {
+    // 区切りオーバーレイ表示
+    showSceneBreak();
+    updateProgress();
+    saveProgress();
+  } else {
+    // 未知の type はとりあえずスキップ候補（今は使わない）
+    updateProgress();
+  }
 }
 
 /**
- * 次の行へ進む
+ * 次のブロックへ進む
  */
-function goToNextLine() {
-  const scene = getCurrentScene();
+function goToNextBlock() {
+  const block = getCurrentBlock();
+  if (!block) return;
 
-  if (currentLineIndex < scene.lines.length - 1) {
-    currentLineIndex += 1;
-    renderCurrentLine();
+  // sceneBreak 中はここでは進めず、オーバーレイ側に任せる
+  if (block.type === "sceneBreak") {
     return;
   }
 
-  // 最後の行 → 区切りオーバーレイ
-  showSceneBreak();
+  if (currentIndex < script.length - 1) {
+    currentIndex += 1;
+    renderCurrentBlock();
+  } else {
+    // 一番最後まで来たら、とりあえず止める（ループさせたければここを変更）
+    currentIndex = script.length - 1;
+  }
 }
 
 /**
  * シーン区切りオーバーレイ表示
  */
 function showSceneBreak() {
+  if (!sceneBreakOverlay) return;
   sceneBreakOverlay.classList.add("scene-break--visible");
 }
 
 /**
- * シーン区切りオーバーレイ非表示 & 次シーンへ（いまは同じシーンをループ）
+ * シーン区切りオーバーレイを閉じて、次のブロックへ
  */
 function proceedFromSceneBreak() {
+  if (!sceneBreakOverlay) return;
   sceneBreakOverlay.classList.remove("scene-break--visible");
 
-  if (currentSceneIndex < scenes.length - 1) {
-    currentSceneIndex += 1;
-  } else {
-    currentSceneIndex = 0;
+  if (currentIndex < script.length - 1) {
+    currentIndex += 1;
+    renderCurrentBlock();
   }
-  currentLineIndex = 0;
-  renderCurrentLine();
 }
 
 /**
- * ゲーム本編をはじめから開始
+ * 新しくゲームを開始（最初から）
  */
 function startNewGame() {
   clearProgress();
-  currentSceneIndex = 0;
-  currentLineIndex = 0;
+  currentIndex = 0;
   hasUserTappedOnce = false;
 
   if (tapHint) {
@@ -166,23 +237,22 @@ function startNewGame() {
   }
 
   hideTitleScreen();
-  renderCurrentLine();
+  renderCurrentBlock();
 }
 
 /**
- * 続きから開始
+ * 続きから再開
  */
 function continueGame() {
   const saved = loadProgress();
 
   if (!saved) {
-    // 進捗がない場合は、はじめからと同じ挙動
+    // 進捗がない場合は最初から
     startNewGame();
     return;
   }
 
-  currentSceneIndex = saved.sceneIndex;
-  currentLineIndex = saved.lineIndex;
+  currentIndex = saved.index;
   hasUserTappedOnce = true;
 
   if (tapHint) {
@@ -190,11 +260,11 @@ function continueGame() {
   }
 
   hideTitleScreen();
-  renderCurrentLine();
+  renderCurrentBlock();
 }
 
 /**
- * タイトル画面を閉じる
+ * タイトル画面を非表示
  */
 function hideTitleScreen() {
   if (!titleScreen) return;
@@ -202,7 +272,7 @@ function hideTitleScreen() {
 }
 
 /**
- * タイトル画面を初期化
+ * タイトル画面のセットアップ
  */
 function setupTitleScreen() {
   const saved = loadProgress();
@@ -217,7 +287,6 @@ function setupTitleScreen() {
     btnContinue.classList.add("title-button--disabled");
   }
 
-  // ボタンイベント
   btnStart.addEventListener("click", () => {
     startNewGame();
   });
@@ -232,11 +301,9 @@ function setupTitleScreen() {
  * 初期化
  */
 function init() {
-  // タイトル画面セットアップ
   setupTitleScreen();
 
-  // ※この時点ではまだタイトルが前面にあるので、
-  //   本編のテキストは描画しない（ボタン押下で開始）
+  // ここではまだ本編は描画しない（START/CONTINUE押下で開始）
 
   // 画面タップでテキストを進める
   gameScreen.addEventListener("click", (event) => {
@@ -264,7 +331,7 @@ function init() {
       }
     }
 
-    goToNextLine();
+    goToNextBlock();
   });
 
   // シーン区切りオーバーレイのタップ処理

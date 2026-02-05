@@ -175,22 +175,20 @@ body {
 }
 
 /* =========================
-   立ち絵（上半身寄せ）
+   立ち絵（上基準・上半身寄り）
 ========================= */
 
 .char-image {
   position: absolute;
   left: 50%;
-  top: 8%;              /* ← 画面上からの位置。頭がちゃんと見えるくらい */
+  top: 6%;             /* 画面上から少し余白をあけて配置 */
   transform: translateX(-50%);
-  height: 115%;         /* ← 少しだけ拡大。上半身寄りになる */
+  height: 120%;        /* ほんの少し大きめ。足元は下でカットされる */
   object-fit: contain;
   pointer-events: none;
   z-index: 5;
   transition: opacity 0.3s ease-out;
 }
-
-
 
 /* =========================
    テキストウィンドウ

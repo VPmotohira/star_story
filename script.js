@@ -1,17 +1,18 @@
 // 進捗保存用キー
 const STORAGE_KEY = "star_story_progress_v1";
 
-// シーンデータ
+// シーンデータ（仮）
+// ※このあと増やしていく
 const scenes = [
   {
     id: "scene_01",
-    speaker: "ナレーション",
+    speaker: "Narration",
     lines: [
-      "夜更けの都市は、静かに軋む機械のように、ゆっくりと回転していた。",
-      "ビルの谷間を縫うように吹き抜ける風は、どこか懐かしい焦げた匂いを運んでくる。",
-      "君のスマホの画面には、見知らぬ送信者からの短いメッセージが、ひとつだけ光っていた。",
-      "――この『観測』を、介入に変える気はあるか？",
-      "指先が、躊躇いの輪郭をなぞる。ほんの少しだけ、世界が静かになる。"
+      "The city at night turned slowly, like a machine in need of oil.",
+      "Wind slipped between towers, carrying the faint scent of something burned and long forgotten.",
+      "On your phone, a single notification glowed from an unknown sender.",
+      "— Will you turn this observation into interference?",
+      "Your fingertip traces the outline of hesitation. For a moment, the world holds its breath."
     ]
   }
 ];
@@ -26,6 +27,11 @@ const textContent = document.getElementById("text-content");
 const sceneBreakOverlay = document.getElementById("scene-break");
 const progressBar = document.getElementById("progress-bar");
 const tapHint = document.getElementById("tap-hint");
+
+// タイトル関連
+const titleScreen = document.getElementById("title-screen");
+const btnStart = document.getElementById("btn-start");
+const btnContinue = document.getElementById("btn-continue");
 
 /**
  * 現在のシーンオブジェクトを取得
@@ -86,6 +92,17 @@ function loadProgress() {
 }
 
 /**
+ * セーブデータを削除
+ */
+function clearProgress() {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (e) {
+    console.warn("Failed to clear progress:", e);
+  }
+}
+
+/**
  * テキストを描画
  */
 function renderCurrentLine() {
@@ -136,29 +153,99 @@ function proceedFromSceneBreak() {
 }
 
 /**
- * 初期化
+ * ゲーム本編をはじめから開始
  */
-function init() {
+function startNewGame() {
+  clearProgress();
+  currentSceneIndex = 0;
+  currentLineIndex = 0;
+  hasUserTappedOnce = false;
+
+  if (tapHint) {
+    tapHint.style.display = "inline-block";
+  }
+
+  hideTitleScreen();
+  renderCurrentLine();
+}
+
+/**
+ * 続きから開始
+ */
+function continueGame() {
+  const saved = loadProgress();
+
+  if (!saved) {
+    // 進捗がない場合は、はじめからと同じ挙動
+    startNewGame();
+    return;
+  }
+
+  currentSceneIndex = saved.sceneIndex;
+  currentLineIndex = saved.lineIndex;
+  hasUserTappedOnce = true;
+
+  if (tapHint) {
+    tapHint.style.display = "none";
+  }
+
+  hideTitleScreen();
+  renderCurrentLine();
+}
+
+/**
+ * タイトル画面を閉じる
+ */
+function hideTitleScreen() {
+  if (!titleScreen) return;
+  titleScreen.style.display = "none";
+}
+
+/**
+ * タイトル画面を初期化
+ */
+function setupTitleScreen() {
   const saved = loadProgress();
 
   if (saved) {
-    // 2回目以降の訪問：途中から＋TAPは最初から非表示
-    currentSceneIndex = saved.sceneIndex;
-    currentLineIndex = saved.lineIndex;
-    hasUserTappedOnce = true;
-    if (tapHint) {
-      tapHint.style.display = "none";
-    }
+    // CONTINUE 有効
+    btnContinue.disabled = false;
+    btnContinue.classList.remove("title-button--disabled");
   } else {
-    // 初回訪問
-    currentSceneIndex = 0;
-    currentLineIndex = 0;
+    // CONTINUE 無効
+    btnContinue.disabled = true;
+    btnContinue.classList.add("title-button--disabled");
   }
 
-  renderCurrentLine();
+  // ボタンイベント
+  btnStart.addEventListener("click", () => {
+    startNewGame();
+  });
+
+  btnContinue.addEventListener("click", () => {
+    if (btnContinue.disabled) return;
+    continueGame();
+  });
+}
+
+/**
+ * 初期化
+ */
+function init() {
+  // タイトル画面セットアップ
+  setupTitleScreen();
+
+  // ※この時点ではまだタイトルが前面にあるので、
+  //   本編のテキストは描画しない（ボタン押下で開始）
 
   // 画面タップでテキストを進める
   gameScreen.addEventListener("click", (event) => {
+    // タイトル画面が出ている間は何もしない
+    if (titleScreen && titleScreen.style.display !== "none") {
+      return;
+    }
+
+    // オーバーレイが出ているときは、そちらのタップ優先
     if (sceneBreakOverlay.classList.contains("scene-break--visible")) {
       return;
     }
@@ -169,7 +256,7 @@ function init() {
       return;
     }
 
-    // 最初の1回タップしたら TAP ヒントを完全に消す
+    // 最初の1回タップしたら TAP ヒントを消す
     if (!hasUserTappedOnce) {
       hasUserTappedOnce = true;
       if (tapHint) {

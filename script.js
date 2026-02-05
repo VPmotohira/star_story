@@ -188,6 +188,7 @@ const script = [
     type: "line",
     speaker: "いろは",
     text: "よし、繋がった。生存確認、問題なし。"
+    char: "iroha_normal"   // ★いろは登場！ここで立ち絵を切り替える
   },
   {
     id: "s5_002",

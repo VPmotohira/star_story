@@ -175,33 +175,32 @@ body {
 }
 
 /* =========================
-   立ち絵（上基準・上半身寄り）
+   立ち絵（上半身寄り・サイズ安定）
 ========================= */
 
-/* 立ち絵 共通 */
+/* 共通ベース */
 #char-image {
   position: absolute;
   left: 50%;
-  bottom: 8vh;              /* 画面下からのベース位置 */
+  bottom: -10vh;                 /* 足元を画面外に逃がす */
   transform: translateX(-50%);
-  max-height: 76vh;         /* 画面に収まるように高さ制限 */
+  transform-origin: center bottom;
+  max-height: 68vh;              /* ← 全体サイズをここで制御 */
   width: auto;
   height: auto;
   pointer-events: none;
-  transition: transform 0.2s ease-out;
+  transition: transform 0.2s ease-out, opacity 0.2s ease-out;
 }
 
-/* ミア：少し大きく、上に寄せる */
+/* ミア */
 #char-image[data-char="mia_normal"] {
-  transform: translateX(-50%) translateY(1vh) scale(1.08);
+  transform: translateX(-50%) translateY(-2vh) scale(0.90) !important;
 }
 
-/* いろは：やや小さめにしてバランスを合わせる */
+/* いろは */
 #char-image[data-char="iroha_normal"] {
-  transform: translateX(-50%) translateY(0) scale(0.95);
+  transform: translateX(-50%) translateY(-1vh) scale(0.92) !important;
 }
-
-
 
 /* =========================
    テキストウィンドウ

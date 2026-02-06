@@ -171,35 +171,35 @@ body {
 }
 
 /* =========================
-   立ち絵（共通 & キャラ別）
+   立ち絵
 ========================= */
 
-/* 共通設定：センター寄せ、下基準 */
+/* 共通：センター寄せ・ベース姿勢 */
 #char-image {
   position: absolute;
   left: 50%;
   bottom: 0;
-  transform: translateX(-50%);
-  max-height: 100vh;  /* 画面の高さを超えない */
+  transform: translateX(-50%) scale(1);
+  max-height: 100vh;
   width: auto;
   height: auto;
   pointer-events: none;
-  transition: transform 0.2s ease-out, bottom 0.2s ease-out;
   z-index: 5;
+
+  /* ← ここにあった transition を削除
+     （上下＆拡大縮小アニメーションの原因） */
 }
 
-/* ミア：上半身を中心に見せたいので
-   ・少し拡大
-   ・bottom をマイナスにして、足側を画面外に落とす */
+/* ミア：上半身寄り（足を少し切り落とすイメージ） */
 #char-image[data-char="mia_normal"] {
   bottom: -16vh;
-  transform: translateX(-60%) scale(1.2);
+  transform: translateX(-50%) scale(1.08);
 }
 
-/* いろは：ほぼ全身＋ちょい拡大でバランス調整 */
+/* いろは：ほぼ全身を見せつつ、少しだけ拡大 */
 #char-image[data-char="iroha_normal"] {
   bottom: -6vh;
-  transform: translateX(-50%) scale(0.91);
+  transform: translateX(-50%) scale(1.04);
 }
 
 /* =========================
@@ -250,15 +250,9 @@ body {
 }
 
 @keyframes tapBlink {
-  0% {
-    opacity: 0.2;
-  }
-  50% {
-    opacity: 0.6;
-  }
-  100% {
-    opacity: 0.2;
-  }
+  0% { opacity: 0.2; }
+  50% { opacity: 0.6; }
+  100% { opacity: 0.2; }
 }
 
 /* =========================

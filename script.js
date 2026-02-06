@@ -1,6 +1,6 @@
 // ================================
 // SECOND CROWN - Prototype
-// script.js（タイトル画面＋立ち絵切替）
+// script.js（タイトル画面＋立ち絵切替＋セーブ）
 // ================================
 
 // ------- セーブ用キー -------
@@ -450,21 +450,20 @@ const script = [
 let currentIndex = 0;
 
 // ------- DOM 取得 -------
-const gameScreen   = document.getElementById("game-screen");
-const bgImage      = document.getElementById("bg-image");
-const charImage    = document.getElementById("char-image");
-const nameLabel    = document.getElementById("name-label");
-const textContent  = document.getElementById("text-content");
-const tapHint      = document.getElementById("tap-hint");
-const progressBar  = document.getElementById("progress-bar");
+const gameScreen  = document.getElementById("game-screen");
+const bgImage     = document.getElementById("bg-image");
+const charImage   = document.getElementById("char-image");
+const nameLabel   = document.getElementById("name-label");
+const textContent = document.getElementById("text-content");
+const tapHint     = document.getElementById("tap-hint");
+const progressBar = document.getElementById("progress-bar");
 
 // タイトル画面関連
-const titleScreen  = document.getElementById("title-screen");
-const btnStart     = document.getElementById("btn-start");
-const btnContinue  = document.getElementById("btn-continue");
+const titleScreen = document.getElementById("title-screen");
+const btnStart    = document.getElementById("btn-start");
+const btnContinue = document.getElementById("btn-continue");
 
 // ------- セーブ系 -------
-
 function saveProgress() {
   try {
     const data = { index: currentIndex };
@@ -517,7 +516,7 @@ function getCurrentBlock() {
 function updateVisuals(block) {
   if (!block) return;
 
-  // 背景：bg が指定されているときだけ更新
+  // 背景（bg が指定されているときだけ更新）
   if ("bg" in block && block.bg && BG_MAP[block.bg]) {
     bgImage.src = BG_MAP[block.bg];
   }
@@ -531,16 +530,14 @@ function updateVisuals(block) {
     if (block.char && CHAR_MAP[block.char]) {
       charImage.src = CHAR_MAP[block.char];
       charImage.style.opacity = "1";
-      // ★ どのキャラかを data 属性に記録
-      charImage.dataset.char = block.char;
+      charImage.dataset.char = block.char; // CSS 用
     } else {
       charImage.style.opacity = "0";
       delete charImage.dataset.char;
     }
   }
 
-
-  nameLabel.textContent = block.speaker || "";
+  nameLabel.textContent  = block.speaker || "";
   textContent.textContent = block.text || "";
 
   updateProgress();
@@ -565,7 +562,6 @@ function goToNextBlock() {
     renderCurrentBlock();
     saveProgress();
   } else {
-    // とりあえず最後まで行ったら TAP ヒントを薄くする
     if (tapHint) {
       tapHint.style.opacity = "0.2";
     }
@@ -595,13 +591,18 @@ function continueGame() {
 
 function hideTitleScreen() {
   if (titleScreen) {
-    titleScreen.style.display = "none"; // CSS 上は flex なので none にする
+    titleScreen.style.display = "none";
   }
 }
 
 // ------- 初期化 -------
 
 function init() {
+  // 立ち絵は最初は非表示にしておく
+  if (charImage) {
+    charImage.style.opacity = "0";
+  }
+
   // 本編側を先に描画しておく（タイトルが上に被ってる状態）
   currentIndex = 0;
   renderCurrentBlock();
@@ -627,7 +628,6 @@ function init() {
   if (gameScreen) {
     gameScreen.addEventListener("click", () => {
       if (titleScreen && titleScreen.style.display !== "none") {
-        // タイトルが出ている間は START/CONTINUE だけ有効
         return;
       }
       goToNextBlock();

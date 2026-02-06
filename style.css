@@ -178,28 +178,29 @@ body {
    立ち絵（上半身寄り・サイズ安定）
 ========================= */
 
-/* 共通ベース */
+/* 共通ベース：背景より前、テキストより後ろ */
 #char-image {
   position: absolute;
   left: 50%;
-  bottom: -10vh;                 /* 足元を画面外に逃がす */
+  bottom: 8vh;                  /* 画面下からちょい上に配置 */
   transform: translateX(-50%);
   transform-origin: center bottom;
-  max-height: 68vh;              /* ← 全体サイズをここで制御 */
+  z-index: 5;                    /* ← これがなかったせいで背景の裏に隠れてた */
+  max-height: 70vh;              /* 全体的な大きさをここで制御 */
   width: auto;
   height: auto;
   pointer-events: none;
   transition: transform 0.2s ease-out, opacity 0.2s ease-out;
 }
 
-/* ミア */
+/* ミア：少しだけ小さめ＆気持ち上に */
 #char-image[data-char="mia_normal"] {
-  transform: translateX(-50%) translateY(-2vh) scale(0.90) !important;
+  transform: translateX(-50%) translateY(-1vh) scale(0.90) !important;
 }
 
-/* いろは */
+/* いろは：ミアとほぼ同じサイズ感に寄せる */
 #char-image[data-char="iroha_normal"] {
-  transform: translateX(-50%) translateY(-1vh) scale(0.92) !important;
+  transform: translateX(-50%) translateY(0vh) scale(0.92) !important;
 }
 
 /* =========================

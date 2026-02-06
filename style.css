@@ -178,17 +178,30 @@ body {
    立ち絵（上基準・上半身寄り）
 ========================= */
 
-.char-image {
+/* 立ち絵 共通 */
+#char-image {
   position: absolute;
   left: 50%;
-  top: 6%;             /* 画面上から少し余白をあけて配置 */
+  bottom: 8vh;              /* 画面下からのベース位置 */
   transform: translateX(-50%);
-  height: 120%;        /* ほんの少し大きめ。足元は下でカットされる */
-  object-fit: contain;
+  max-height: 76vh;         /* 画面に収まるように高さ制限 */
+  width: auto;
+  height: auto;
   pointer-events: none;
-  z-index: 5;
-  transition: opacity 0.3s ease-out;
+  transition: transform 0.2s ease-out;
 }
+
+/* ミア：少し大きく、上に寄せる */
+#char-image[data-char="mia_normal"] {
+  transform: translateX(-50%) translateY(1vh) scale(1.08);
+}
+
+/* いろは：やや小さめにしてバランスを合わせる */
+#char-image[data-char="iroha_normal"] {
+  transform: translateX(-50%) translateY(0) scale(0.95);
+}
+
+
 
 /* =========================
    テキストウィンドウ

@@ -196,7 +196,7 @@ body {
 /* 数値は様子見ながら微調整してOK */
 
 #char-image[data-char="mia_normal"] {
-  transform: translateX(-50%) scale(1.12);
+  transform: translateX(-50%) scale(1.00);
 }
 
 #char-image[data-char="iroha_normal"] {

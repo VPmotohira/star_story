@@ -76,11 +76,7 @@ body {
 .title-screen {
   position: absolute;
   inset: 0;
-  background: radial-gradient(
-    ellipse at center,
-    #111 0%,
-    #000 70%
-  );
+  background: radial-gradient(ellipse at center, #111 0%, #000 70%);
   z-index: 50;
   display: flex;
   justify-content: center;
@@ -175,32 +171,30 @@ body {
 }
 
 /* =========================
-   立ち絵（上半身寄り・サイズ安定）
+   立ち絵
+   - 高さをキャラごとに指定
 ========================= */
 
-/* 共通ベース：背景より前、テキストより後ろ */
 #char-image {
   position: absolute;
   left: 50%;
-  bottom: 8vh;                  /* 画面下からちょい上に配置 */
+  bottom: 0;              /* 足元が画面下にかぶる感じ */
   transform: translateX(-50%);
-  transform-origin: center bottom;
-  z-index: 5;                    /* ← これがなかったせいで背景の裏に隠れてた */
-  max-height: 70vh;              /* 全体的な大きさをここで制御 */
   width: auto;
-  height: auto;
+  height: 80vh;           /* デフォルト高さ（ミア用のベース） */
   pointer-events: none;
-  transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+  z-index: 5;             /* 背景より前、テキストより後ろ */
+  transition: transform 0.2s ease-out;
 }
 
-/* ミア：少しだけ小さめ＆気持ち上に */
+/* ミア：やや大きめに全身が映る高さ */
 #char-image[data-char="mia_normal"] {
-  transform: translateX(-50%) translateY(-1vh) scale(0.90) !important;
+  height: 82vh;
 }
 
-/* いろは：ミアとほぼ同じサイズ感に寄せる */
+/* いろは：少し小さめにして頭が天井に近づきすぎないように */
 #char-image[data-char="iroha_normal"] {
-  transform: translateX(-50%) translateY(0vh) scale(0.92) !important;
+  height: 76vh;
 }
 
 /* =========================
@@ -280,7 +274,7 @@ body {
 }
 
 /* =========================
-   シーン区切り
+   シーン区切り用（今後使う用）
 ========================= */
 
 .scene-break {

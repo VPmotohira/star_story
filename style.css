@@ -171,36 +171,35 @@ body {
 }
 
 /* =========================
-   立ち絵
+   立ち絵（共通 & キャラ別）
 ========================= */
 
-/* 共通：下揃え・中央寄せ。transform はここでは指定しない */
+/* 共通設定：センター寄せ、下基準 */
 #char-image {
   position: absolute;
   left: 50%;
   bottom: 0;
-  transform-origin: 50% 100%;   /* 下中央を基準に拡大縮小 */
-  max-height: 95vh;             /* 画面内に収める上限 */
+  transform: translateX(-50%);
+  max-height: 100vh;  /* 画面の高さを超えない */
   width: auto;
   height: auto;
   pointer-events: none;
+  transition: transform 0.2s ease-out, bottom 0.2s ease-out;
   z-index: 5;
 }
 
-/* フォールバック（data-char が無いとき） */
-#char-image:not([data-char]) {
-  transform: translateX(-50%) scale(1);
-}
-
-/* --- キャラごとのサイズ調整 --- */
-/* 数値は様子見ながら微調整してOK */
-
+/* ミア：上半身を中心に見せたいので
+   ・少し拡大
+   ・bottom をマイナスにして、足側を画面外に落とす */
 #char-image[data-char="mia_normal"] {
-  transform: translateX(-50%) scale(0.95);
+  bottom: -16vh;
+  transform: translateX(-50%) scale(1.1);
 }
 
+/* いろは：ほぼ全身＋ちょい拡大でバランス調整 */
 #char-image[data-char="iroha_normal"] {
-  transform: translateX(-50%) scale(0.93);
+  bottom: -6vh;
+  transform: translateX(-50%) scale(1.05);
 }
 
 /* =========================

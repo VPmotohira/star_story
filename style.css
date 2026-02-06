@@ -193,13 +193,13 @@ body {
    ・bottom をマイナスにして、足側を画面外に落とす */
 #char-image[data-char="mia_normal"] {
   bottom: -16vh;
-  transform: translateX(-50%) scale(1.1);
+  transform: translateX(-60%) scale(1.2);
 }
 
 /* いろは：ほぼ全身＋ちょい拡大でバランス調整 */
 #char-image[data-char="iroha_normal"] {
   bottom: -6vh;
-  transform: translateX(-50%) scale(1.05);
+  transform: translateX(-50%) scale(0.91);
 }
 
 /* =========================

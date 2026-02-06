@@ -172,29 +172,35 @@ body {
 
 /* =========================
    立ち絵
-   - 高さをキャラごとに指定
 ========================= */
 
+/* 共通：下揃え・中央寄せ。transform はここでは指定しない */
 #char-image {
   position: absolute;
   left: 50%;
-  bottom: 0;              /* 足元が画面下にかぶる感じ */
-  transform: translateX(-50%);
+  bottom: 0;
+  transform-origin: 50% 100%;   /* 下中央を基準に拡大縮小 */
+  max-height: 95vh;             /* 画面内に収める上限 */
   width: auto;
-  height: 80vh;           /* デフォルト高さ（ミア用のベース） */
+  height: auto;
   pointer-events: none;
-  z-index: 5;             /* 背景より前、テキストより後ろ */
-  transition: transform 0.2s ease-out;
+  z-index: 5;
 }
 
-/* ミア：やや大きめに全身が映る高さ */
+/* フォールバック（data-char が無いとき） */
+#char-image:not([data-char]) {
+  transform: translateX(-50%) scale(1);
+}
+
+/* --- キャラごとのサイズ調整 --- */
+/* 数値は様子見ながら微調整してOK */
+
 #char-image[data-char="mia_normal"] {
-  height: 82vh;
+  transform: translateX(-50%) scale(1.12);
 }
 
-/* いろは：少し小さめにして頭が天井に近づきすぎないように */
 #char-image[data-char="iroha_normal"] {
-  height: 76vh;
+  transform: translateX(-50%) scale(0.93);
 }
 
 /* =========================
@@ -245,9 +251,15 @@ body {
 }
 
 @keyframes tapBlink {
-  0% { opacity: 0.2; }
-  50% { opacity: 0.6; }
-  100% { opacity: 0.2; }
+  0% {
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0.2;
+  }
 }
 
 /* =========================
@@ -274,7 +286,7 @@ body {
 }
 
 /* =========================
-   シーン区切り用（今後使う用）
+   シーン区切り
 ========================= */
 
 .scene-break {

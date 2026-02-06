@@ -531,10 +531,14 @@ function updateVisuals(block) {
     if (block.char && CHAR_MAP[block.char]) {
       charImage.src = CHAR_MAP[block.char];
       charImage.style.opacity = "1";
+      // ★ どのキャラかを data 属性に記録
+      charImage.dataset.char = block.char;
     } else {
       charImage.style.opacity = "0";
+      delete charImage.dataset.char;
     }
   }
+
 
   nameLabel.textContent = block.speaker || "";
   textContent.textContent = block.text || "";
